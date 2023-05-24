@@ -3,6 +3,7 @@ package xyz.cherish.utils;
 import xyz.cherish.exception.BeansException;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Type;
 
 /**
  * Bean的一些操作
@@ -19,7 +20,18 @@ public class BeanUtils {
             throws NoSuchFieldException, IllegalAccessException {
         Field field = bean.getClass().getDeclaredField(filedName);
         field.setAccessible(true);
-        field.set(bean, value);
+        switch (field.getType().getName()) {
+            case "int", "java.lang.Integer" -> field.set(bean, Integer.valueOf(value.toString()));
+            case "long", "java.lang.Long" -> field.set(bean, Long.valueOf(value.toString()));
+            case "double", "java.lang.Double" -> field.set(bean, Double.valueOf(value.toString()));
+            case "float", "java.lang.Float" -> field.set(bean, Float.valueOf(value.toString()));
+            case "boolean", "java.lang.Boolean" -> field.set(bean, Boolean.valueOf(value.toString()));
+            case "java.lang.String" -> field.set(bean, value.toString());
+            case "byte", "java.lang.Byte" -> field.set(bean, Byte.valueOf(value.toString()));
+            case "char", "java.lang.Character" ->field.set(bean, value.toString().charAt(0));
+            default -> field.set(bean, value);
+        }
+//        field.set(bean, value);
     }
 
 

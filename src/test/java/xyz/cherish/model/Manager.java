@@ -22,4 +22,12 @@ public class Manager {
     public void setChildUser(User childUser) {
         this.childUser = childUser;
     }
+
+    @Override
+    public String toString() {
+        return "Manager{" +
+                "name='" + name + '\'' +
+                ", childUser=" + childUser +
+                '}';
+    }
 }
