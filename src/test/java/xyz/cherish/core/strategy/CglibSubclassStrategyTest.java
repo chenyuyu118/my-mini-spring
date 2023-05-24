@@ -7,6 +7,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import xyz.cherish.core.beans.BeanDefinition;
+import xyz.cherish.model.User;
 
 import java.lang.reflect.Method;
 

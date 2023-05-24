@@ -15,8 +15,10 @@ public class BeanUtils {
         }
     }
 
-    private static void setSimpleFiledValue(Object bean, String filedName, Object value) throws NoSuchFieldException, IllegalAccessException {
-        Field field = bean.getClass().getField(filedName);
+    private static void setSimpleFiledValue(Object bean, String filedName, Object value)
+            throws NoSuchFieldException, IllegalAccessException {
+        Field field = bean.getClass().getDeclaredField(filedName);
+        field.setAccessible(true);
         field.set(bean, value);
     }
 

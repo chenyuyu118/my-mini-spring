@@ -1,4 +1,4 @@
-package xyz.cherish.core.strategy;
+package xyz.cherish.model;
 
 public class User {
     public String name;

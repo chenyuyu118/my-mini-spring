@@ -11,14 +11,16 @@ import java.util.Map;
  * bean的抽象工厂，有单例获取单例，否则通过工厂出产
  */
 public abstract class AbstractBeanFactory extends DefaultSingletonRegistry implements BeanFactory {
-    private Map<String, Object> factoryBeanCached = new HashMap<>();
+    private final Map<String, Object> factoryBeanCached = new HashMap<>();
 
     @Override
     public Object getBean(String beanName) throws BeansException {
+        // 首先尝试获取单例
         Object singleton = getSingleton(beanName);
         if (singleton != null) {
             return singleton;
         }
+        // 获取单例失败，尝试获取bean工厂或者是bean实例
         BeanDefinition beanDefinition = getBeanDefinition(beanName);
         Object bean = createBean(beanName, beanDefinition);
         return getObjectForBeanInstance(bean, beanName);

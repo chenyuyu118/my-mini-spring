@@ -1,6 +1,7 @@
 package xyz.cherish.core.config;
 
 import xyz.cherish.core.beans.BeanDefinition;
+import xyz.cherish.core.beans.BeanReference;
 import xyz.cherish.core.beans.PropertyValue;
 import xyz.cherish.core.strategy.InstantiationStrategy;
 import xyz.cherish.core.strategy.SimpleInstantiationStrategy;
@@ -48,7 +49,12 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
             Iterator<PropertyValue> properties = beanDefinition.getPropertyValues().getProperties();
             while (properties.hasNext()) {
                 PropertyValue propertyValue = properties.next();
-                BeanUtils.setFileValue(bean, propertyValue.getFiled(), propertyValue.getValue());
+                Object filedValue;
+                if ((filedValue = propertyValue.getValue()) instanceof BeanReference) {
+                    BeanReference beanReference = (BeanReference) filedValue;
+                    filedValue = getBean(beanReference.getName());
+                }
+                BeanUtils.setFileValue(bean, propertyValue.getFiled(), filedValue);
             }
         } catch (Exception exception) {
             throw new BeansException("Error setting property values for bean: " + beanName, exception);
