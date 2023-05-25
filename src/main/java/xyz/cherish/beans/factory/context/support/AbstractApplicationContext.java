@@ -3,7 +3,13 @@ package xyz.cherish.beans.factory.context.support;
 import xyz.cherish.beans.factory.ConfigurableListableBeanFactory;
 import xyz.cherish.beans.factory.config.BeanFactoryPostProcessor;
 import xyz.cherish.beans.factory.config.BeanPostProcessor;
+import xyz.cherish.beans.factory.context.ApplicationEvent;
+import xyz.cherish.beans.factory.context.ApplicationListener;
 import xyz.cherish.beans.factory.context.ConfigurableApplicationContext;
+import xyz.cherish.beans.factory.context.event.ApplicationEventMulticaster;
+import xyz.cherish.beans.factory.context.event.ContextClosedEvent;
+import xyz.cherish.beans.factory.context.event.ContextRefreshedEvent;
+import xyz.cherish.beans.factory.context.event.SimpleApplicationEventMulticaster;
 import xyz.cherish.core.io.DefaultResourceLoader;
 import xyz.cherish.exception.BeansException;
 
@@ -13,6 +19,9 @@ import java.util.Map;
  * 抽象的应用上下文
  */
 public abstract class AbstractApplicationContext extends DefaultResourceLoader implements ConfigurableApplicationContext {
+
+    public static final String APPLICATION_EVENT_MULTICASTER_BEAN_NAME = "applicationEventMulticaster"; // 事件发布者的bean名朝
+    private ApplicationEventMulticaster applicationEventMulticaster;
 
     @Override
     public Object getBean(String name) throws BeansException {
@@ -44,21 +53,53 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
      */
     @Override
     public void refresh() throws BeansException {
-        refreshBeanFactory();
-        ConfigurableListableBeanFactory beanFactory = getBeanFactory();
-
-        // Bean实例化之前，先处理Bean工厂中BeanDefinition
-        invokeBeanFactoryPostProcessors(beanFactory);
+        refreshBeanFactory(); // 创建BeanFactory，然后获取所有BeanDefinition
+        ConfigurableListableBeanFactory beanFactory = getBeanFactory(); // 获取当前的BeanFactory
 
         // 添加ApplicationContextAware的前置处理器，确保实现了ApplicationContextAware的对象
         // 可以在注入时自动获得ApplicationContext
         beanFactory.addBeanPostProcessor(new ApplicationContextAwareProcessor(this));
 
+        // Bean实例化之前，先处理Bean工厂中 BeanDefinition
+        invokeBeanFactoryPostProcessors(beanFactory);
+
         // BeanPostProcessor在Bean初始化之前进行初始化
         registerBeanPostProcessors(beanFactory);
 
+        // 初始化事件发布者
+        initApplicationEventMulticaster();
+
+        // 初始化时间监听者Bean
+        registerListeners();
+
         // 实例化单例Bean
         beanFactory.preInstantiateSingletons();
+
+        // 发布容器刷新完成时间
+        finishRefresh();
+    }
+
+    private void finishRefresh() {
+        publishEvent(new ContextRefreshedEvent(this));
+    }
+
+    private void publishEvent(ApplicationEvent contextRefreshedEvent) {
+        applicationEventMulticaster.multicastEvent(contextRefreshedEvent);
+    }
+
+    private void registerListeners() {
+        for (ApplicationListener<?> applicationListener : getBeansOfType(ApplicationListener.class).values()) {
+            applicationEventMulticaster.addApplicationListener((ApplicationListener<? super ApplicationEvent>) applicationListener);
+        }
+    }
+
+    /**
+     * 初始化时间发布器
+     */
+    private void initApplicationEventMulticaster() {
+        ConfigurableListableBeanFactory beanFactory = getBeanFactory();
+        applicationEventMulticaster = new SimpleApplicationEventMulticaster(beanFactory);
+        beanFactory.addSingleton(APPLICATION_EVENT_MULTICASTER_BEAN_NAME, applicationEventMulticaster);
     }
 
     protected void registerBeanPostProcessors(ConfigurableListableBeanFactory beanFactory) {
@@ -92,6 +133,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
     }
 
     protected void doClose() {
+        publishEvent(new ContextClosedEvent(this));
         destroyBeans();
     }
 

@@ -13,6 +13,11 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
     }
 
 
+    /**
+     * 初始化BeanFactory
+     *
+     * @throws BeansException 创建失败
+     */
     @Override
     protected void refreshBeanFactory() throws BeansException {
         DefaultListableBeanFactory newBeanFactory = createBeanFactory();
@@ -20,6 +25,11 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
         this.beanFactory = newBeanFactory;
     }
 
+    /**
+     * 从Resource中加载BeanDefinition
+     *
+     * @param beanFactory 新建的BeanFactory
+     */
     public abstract void loadBeanDefinition(DefaultListableBeanFactory beanFactory);
 
     private DefaultListableBeanFactory createBeanFactory() {

@@ -1,6 +1,7 @@
 package xyz.cherish.beans.factory.support;
 
 import xyz.cherish.beans.PropertyValue;
+import xyz.cherish.beans.factory.BeanFactoryAware;
 import xyz.cherish.beans.factory.DisposableBean;
 import xyz.cherish.beans.factory.InitializingBean;
 import xyz.cherish.beans.factory.config.AutowireCapableBeanFactory;
@@ -78,6 +79,11 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
      * @return bean处理后的结果
      */
     private Object initializeBean(String beanName, Object bean, BeanDefinition beanDefinition) {
+        if (bean instanceof BeanFactoryAware beanFactoryAware) {
+            // 对于Aware注入Factory
+            beanFactoryAware.setBeanFactory(this);
+        }
+
         Object processedObj = applyBeanPostProcessorBeforeInitialization(bean, beanName);
 
         try {
