@@ -24,7 +24,7 @@ public abstract class AbstractBeanFactory extends DefaultSingletonRegistry imple
         // 首先尝试获取单例
         Object singleton = getSingleton(beanName);
         if (singleton != null) {
-            return singleton;
+            return getObjectForBeanInstance(singleton, beanName);
         }
         // 获取单例失败，尝试获取bean工厂或者是bean实例
         BeanDefinition beanDefinition = getBeanDefinition(beanName);
@@ -43,25 +43,26 @@ public abstract class AbstractBeanFactory extends DefaultSingletonRegistry imple
      * @return bean实例
      */
     protected Object getObjectForBeanInstance(Object beanInstance, String beanName) {
-        if (beanInstance instanceof FactoryBean) {
+        Object object = beanInstance;
+        if (object instanceof FactoryBean factoryBean) {
             try {
-                if (((FactoryBean<?>) beanInstance).isSingleton()) {
+                if (factoryBean.isSingleton()) {
                     // 如果为单例的话，从缓存中获取工厂已经生产的单例
-                    Object cached = factoryBeanCached.get(beanName);
-                    if (cached == null) {
+                    object = factoryBeanCached.get(beanName);
+                    if (object == null) {
                         // 如果不存在已有实例，则新建一个放入缓存
-                        Object object = ((FactoryBean<?>) beanInstance).getObject();
+                        object = factoryBean.getObject();
                         factoryBeanCached.put(beanName, object);
                     }
                 } else {
                     // 非单例创建，直接创建对应实例即可
-                    return ((FactoryBean<?>) beanInstance).getObject();
+                    return factoryBean.getObject();
                 }
             } catch (Exception e) {
                 throw new BeansException("FactoryBean throw Exception on object[" + beanName + "] creation", e);
             }
         }
-        return beanInstance;
+        return object;
     }
 
     @Override

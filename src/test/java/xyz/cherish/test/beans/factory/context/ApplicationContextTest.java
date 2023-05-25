@@ -29,4 +29,13 @@ public class ApplicationContextTest {
         User user1 = applicationContext.getBean("user", User.class);
         assert user != user1;
     }
+
+    @Test
+    public void testFactoryBean() {
+        ApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:userFactory.xml");
+        User user = (User) applicationContext.getBean("user");
+        User user1 = applicationContext.getBean("user", User.class);
+        System.out.println(user);
+        assert user != user1;
+    }
 }
