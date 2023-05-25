@@ -10,6 +10,26 @@ public class BeanDefinition {
 
     private String destroyMethodName;
 
+    public static final String SCOPE_SINGLETON = "singleton";
+    public static final String SCOPE_PROTOTYPE = "prototype";
+    private String scope = SCOPE_SINGLETON;
+    private boolean singleton = true;
+    private boolean prototype = false;
+
+    public void setScope(String scope) {
+        this.scope = scope == null ? SCOPE_SINGLETON : scope;
+        prototype = SCOPE_PROTOTYPE.equals(scope);
+        singleton = !prototype;
+    }
+
+    public boolean isSingleton() {
+        return singleton;
+    }
+
+    public boolean isPrototype() {
+        return prototype;
+    }
+
     public String getInitMethodName() {
         return initMethodName;
     }

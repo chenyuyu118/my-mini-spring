@@ -23,6 +23,7 @@ import java.util.Objects;
 public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFactory implements AutowireCapableBeanFactory {
     private static final InstantiationStrategy DEFAULT_STRATEGY = new SimpleInstantiationStrategy();
     private InstantiationStrategy instantiationStrategy;
+
     @Override
     /**
      * 创建bean的一般流程
@@ -31,6 +32,13 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         return doCreateBean(beanName, beanDefinition);
     }
 
+    /**
+     * 实际创建一个Bean
+     *
+     * @param beanName       bean名称
+     * @param beanDefinition bean的定义
+     * @return 创建的bean实例
+     */
     protected Object doCreateBean(String beanName, BeanDefinition beanDefinition) {
         Object bean = null;
         try {
@@ -42,14 +50,18 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         }
         // 注册有销毁方法的bean
         registerDisposableBeanIfNecessary(beanName, bean, beanDefinition);
-
-        addSingleton(beanName, bean);
+        if (beanDefinition.isSingleton()) {
+            addSingleton(beanName, bean);
+        }
         return bean;
     }
 
     private void registerDisposableBeanIfNecessary(String beanName, Object bean, BeanDefinition beanDefinition) {
-        if (bean instanceof DisposableBean disposableBean || !beanDefinition.getDestroyMethodName().isEmpty()) {
-            registerDisposeBean(beanName, bean, beanDefinition);
+        if (beanDefinition.isSingleton()) {
+            // 只对单例进行销毁注册
+            if (bean instanceof DisposableBean disposableBean || !beanDefinition.getDestroyMethodName().isEmpty()) {
+                registerDisposeBean(beanName, bean, beanDefinition);
+            }
         }
     }
 
