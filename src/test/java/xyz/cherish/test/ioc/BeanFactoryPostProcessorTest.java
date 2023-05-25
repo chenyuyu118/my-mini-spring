@@ -20,7 +20,7 @@ public class BeanFactoryPostProcessorTest {
         添加后置处理器
          */
         CustomBeanPostProcessor customBeanPostProcessor = new CustomBeanPostProcessor();
-        beanFactory.addBeanPostProcessors(customBeanPostProcessor);
+        beanFactory.addBeanPostProcessor(customBeanPostProcessor);
         /*
         检查后置处理结果
          */

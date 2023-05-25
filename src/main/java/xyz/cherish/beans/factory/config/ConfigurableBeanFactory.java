@@ -6,5 +6,5 @@ import xyz.cherish.beans.factory.ListableBeanFactory;
  * 可配置的BeanFactory
  */
 public interface ConfigurableBeanFactory extends AutowireCapableBeanFactory, ListableBeanFactory {
-
+    void addBeanPostProcessor(BeanPostProcessor postProcessor);
 }

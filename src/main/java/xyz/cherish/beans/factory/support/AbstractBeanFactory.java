@@ -32,7 +32,8 @@ public abstract class AbstractBeanFactory extends DefaultSingletonRegistry imple
         return getObjectForBeanInstance(bean, beanName);
     }
 
-    protected abstract BeanDefinition getBeanDefinition(String beanName);
+    public abstract BeanDefinition getBeanDefinition(String beanName);
+
     protected abstract Object createBean(String beanName, BeanDefinition beanDefinition);
 
     /**
@@ -70,18 +71,14 @@ public abstract class AbstractBeanFactory extends DefaultSingletonRegistry imple
     }
 
 
-    @Override
-    public boolean containBean(String beanName) {
-        return containBeanDefinition(beanName);
-    }
-
     protected abstract boolean containBeanDefinition(String beanName);
 
     public List<BeanPostProcessor> getBeanPostProcessors() {
         return beanPostProcessors;
     }
 
-    public void addBeanPostProcessors(BeanPostProcessor beanPostProcessor) {
+    @Override
+    public void addBeanPostProcessor(BeanPostProcessor beanPostProcessor) {
         beanPostProcessors.remove(beanPostProcessor); // 删除原有的processor，再进行一次添加，进行覆盖操作
         beanPostProcessors.add(beanPostProcessor);
     }

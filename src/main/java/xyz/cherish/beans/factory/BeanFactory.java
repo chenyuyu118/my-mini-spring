@@ -7,7 +7,8 @@ import xyz.cherish.exception.BeansException;
  */
 public interface BeanFactory {
     Object getBean(String name) throws BeansException;
-    <T> T getBean(String name, Class<T> clazz) throws BeansException;
-//    <T> T getBean(Class<T> clazz) throws BeansException;
-    boolean containBean(String name);
+
+    default <T> T getBean(String name, Class<T> clazz) throws BeansException {
+        return (T) getBean(name);
+    }
 }
