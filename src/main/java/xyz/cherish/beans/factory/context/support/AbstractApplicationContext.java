@@ -36,6 +36,12 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
         return getBeanFactory().getBeanDefinitionNames();
     }
 
+    /**
+     * 初始化ApplicationContext，包括Factory创建，BeanDefinition处理，BeanPostProcessor的注册
+     * 实现ApplicationContextAware对象的Context注入，最后是bean的初始化
+     *
+     * @throws BeansException 初始化失败
+     */
     @Override
     public void refresh() throws BeansException {
         refreshBeanFactory();
@@ -43,6 +49,10 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 
         // Bean实例化之前，先处理Bean工厂中BeanDefinition
         invokeBeanFactoryPostProcessors(beanFactory);
+
+        // 添加ApplicationContextAware的前置处理器，确保实现了ApplicationContextAware的对象
+        // 可以在注入时自动获得ApplicationContext
+        beanFactory.addBeanPostProcessor(new ApplicationContextAwareProcessor(this));
 
         // BeanPostProcessor在Bean初始化之前进行初始化
         registerBeanPostProcessors(beanFactory);
