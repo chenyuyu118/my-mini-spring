@@ -1,11 +1,14 @@
 package xyz.cherish.beans.factory.support;
 
-import xyz.cherish.beans.factory.config.BeanDefinition;
-import xyz.cherish.beans.factory.config.ConfigurableBeanFactory;
 import xyz.cherish.beans.FactoryBean;
+import xyz.cherish.beans.factory.config.BeanDefinition;
+import xyz.cherish.beans.factory.config.BeanPostProcessor;
+import xyz.cherish.beans.factory.config.ConfigurableBeanFactory;
 import xyz.cherish.exception.BeansException;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -13,6 +16,8 @@ import java.util.Map;
  */
 public abstract class AbstractBeanFactory extends DefaultSingletonRegistry implements ConfigurableBeanFactory {
     private final Map<String, Object> factoryBeanCached = new HashMap<>();
+    private final List<BeanPostProcessor> beanPostProcessors = new ArrayList<>();
+
 
     @Override
     public Object getBean(String beanName) throws BeansException {
@@ -71,4 +76,13 @@ public abstract class AbstractBeanFactory extends DefaultSingletonRegistry imple
     }
 
     protected abstract boolean containBeanDefinition(String beanName);
+
+    public List<BeanPostProcessor> getBeanPostProcessors() {
+        return beanPostProcessors;
+    }
+
+    public void addBeanPostProcessors(BeanPostProcessor beanPostProcessor) {
+        beanPostProcessors.remove(beanPostProcessor); // 删除原有的processor，再进行一次添加，进行覆盖操作
+        beanPostProcessors.add(beanPostProcessor);
+    }
 }

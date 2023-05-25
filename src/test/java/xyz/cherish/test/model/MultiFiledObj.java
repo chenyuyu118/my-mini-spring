@@ -1,4 +1,4 @@
-package xyz.cherish.model;
+package xyz.cherish.test.model;
 
 public class MultiFiledObj {
     public int intFiled;

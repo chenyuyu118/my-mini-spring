@@ -1,4 +1,4 @@
-package xyz.cherish.beans.factory.strategy;
+package xyz.cherish.test.beans.factory.strategy;
 
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
@@ -7,7 +7,8 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import xyz.cherish.beans.factory.config.BeanDefinition;
-import xyz.cherish.model.User;
+import xyz.cherish.beans.factory.strategy.CglibSubclassingInstantiationStrategy;
+import xyz.cherish.test.model.User;
 
 import java.lang.reflect.Method;
 

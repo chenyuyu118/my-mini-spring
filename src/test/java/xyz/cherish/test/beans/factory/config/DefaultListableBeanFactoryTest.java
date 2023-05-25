@@ -1,13 +1,13 @@
-package xyz.cherish.beans.factory.config;
+package xyz.cherish.test.beans.factory.config;
 
 import org.junit.Test;
 import xyz.cherish.beans.PropertyValues;
 import xyz.cherish.beans.factory.config.BeanDefinition;
 import xyz.cherish.beans.factory.config.BeanReference;
 import xyz.cherish.beans.factory.support.DefaultListableBeanFactory;
-import xyz.cherish.model.Manager;
-import xyz.cherish.model.MultiFiledObj;
-import xyz.cherish.model.User;
+import xyz.cherish.test.model.Manager;
+import xyz.cherish.test.model.MultiFiledObj;
+import xyz.cherish.test.model.User;
 import xyz.cherish.utils.BeanUtils;
 
 public class DefaultListableBeanFactoryTest {

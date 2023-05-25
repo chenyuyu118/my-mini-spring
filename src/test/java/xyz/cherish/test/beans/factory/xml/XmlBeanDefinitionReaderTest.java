@@ -1,12 +1,12 @@
-package xyz.cherish.beans.factory.xml;
+package xyz.cherish.test.beans.factory.xml;
 
 import org.junit.Test;
 import xyz.cherish.beans.factory.support.DefaultListableBeanFactory;
-import xyz.cherish.core.io.ClassPathResource;
+import xyz.cherish.beans.factory.xml.XmlBeanDefinitionReader;
 import xyz.cherish.core.io.DefaultResourceLoader;
-import xyz.cherish.model.Manager;
-import xyz.cherish.model.MultiFiledObj;
-import xyz.cherish.model.User;
+import xyz.cherish.test.model.Manager;
+import xyz.cherish.test.model.MultiFiledObj;
+import xyz.cherish.test.model.User;
 
 public class XmlBeanDefinitionReaderTest {
     @Test

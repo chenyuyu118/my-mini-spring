@@ -3,6 +3,7 @@ package xyz.cherish.beans.factory.support;
 import xyz.cherish.beans.PropertyValue;
 import xyz.cherish.beans.factory.config.AutowireCapableBeanFactory;
 import xyz.cherish.beans.factory.config.BeanDefinition;
+import xyz.cherish.beans.factory.config.BeanPostProcessor;
 import xyz.cherish.beans.factory.config.BeanReference;
 import xyz.cherish.beans.factory.strategy.InstantiationStrategy;
 import xyz.cherish.beans.factory.strategy.SimpleInstantiationStrategy;
@@ -16,9 +17,8 @@ import java.util.Objects;
  * 工厂Bean注册
  */
 public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFactory implements AutowireCapableBeanFactory {
-    public static final InstantiationStrategy DEFAULT_STRATEGY = new SimpleInstantiationStrategy();
+    private static final InstantiationStrategy DEFAULT_STRATEGY = new SimpleInstantiationStrategy();
     private InstantiationStrategy instantiationStrategy;
-
     @Override
     /**
      * 创建bean的一般流程
@@ -30,8 +30,9 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
     protected Object doCreateBean(String beanName, BeanDefinition beanDefinition) {
         Object bean = null;
         try {
-            bean = createBeanInstance(beanDefinition);
-            applyPropertyValues(beanName, bean, beanDefinition);
+            bean = createBeanInstance(beanDefinition); // 创建一个空实例
+            applyPropertyValues(beanName, bean, beanDefinition); // 赋值属性
+            bean = initializeBean(beanName, bean, beanDefinition); // 进行前置和后置处理
         } catch (Exception ex) {
             throw new BeansException("Instantiate failed", ex);
         }
@@ -40,9 +41,32 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
     }
 
     /**
+     * 进行bean的前置和后置处理
+     *
+     * @param beanName       bean名称
+     * @param bean           bean对象
+     * @param beanDefinition bean的定义
+     * @return bean处理后的结果
+     */
+    private Object initializeBean(String beanName, Object bean, BeanDefinition beanDefinition) {
+        Object processedObj = applyBeanPostProcessorBeforeInitialization(bean, beanName);
+
+        invokeInitMethods(beanName, processedObj, beanDefinition); // 执行我们需要的bean-init方法
+
+        processedObj = applyBeanPostProcessorAfterInitialization(bean, beanName);
+        return processedObj;
+    }
+
+    // TODO 后面实现bean的初始化方法
+    private void invokeInitMethods(String beanName, Object processedObj, BeanDefinition beanDefinition) {
+
+    }
+
+    /**
      * 为bean设置属性
-     * @param beanName bean名称
-     * @param bean bean实例
+     *
+     * @param beanName       bean名称
+     * @param bean           bean实例
      * @param beanDefinition bean定义
      */
     private void applyPropertyValues(String beanName, Object bean, BeanDefinition beanDefinition) {
@@ -75,25 +99,47 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         this.instantiationStrategy = instantiationStrategy;
     }
 
-    /**
-     * 通过代理创建对象
-     * @param beanName
-     * @param beanDefinition
-     * @return
-     */
-    private Object resolveBeforeInstantiation(String beanName, BeanDefinition beanDefinition) {
-        Object bean = applyBeanPostProcessorBeforeInstantiation(beanDefinition.getBeanClass(), beanName);
-        return bean;
-    }
+//    /**
+//     * 通过代理创建对象
+//     * @param beanName
+//     * @param beanDefinition
+//     * @return
+//     */
+//    private Object resolveBeforeInstantiation(String beanName, BeanDefinition beanDefinition) {
+//        Object bean = applyBeanPostProcessorBeforeInstantiation(beanDefinition.getBeanClass(), beanName);
+//        return bean;
+//    }
 
     /**
      * 在bean初始化之前进行的后置处理
-     * @param beanClass bean的Class
+     *
+     * @param bean     bean的Object
      * @param beanName bean的名称
      * @return bean的实例，可能为空
      */
-    private Object applyBeanPostProcessorBeforeInstantiation(Class<?> beanClass, String beanName) {
-        return null;
+    @Override
+    public Object applyBeanPostProcessorBeforeInitialization(Object bean, String beanName) throws BeansException {
+        Object processedObj = bean;
+        for (BeanPostProcessor processor : getBeanPostProcessors()) {
+            Object afterProcess = processor.postProcessBeforeInitialization(processedObj, beanName);
+            if (afterProcess == null) {
+                return processedObj;
+            }
+            processedObj = afterProcess;
+        }
+        return processedObj;
     }
 
+    @Override
+    public Object applyBeanPostProcessorAfterInitialization(Object bean, String beanName) throws BeansException {
+        Object processedObj = bean;
+        for (BeanPostProcessor processor : getBeanPostProcessors()) {
+            Object afterProcess = processor.postProcessAfterInitialization(processedObj, beanName);
+            if (afterProcess == null) {
+                return processedObj;
+            }
+            processedObj = afterProcess;
+        }
+        return processedObj;
+    }
 }

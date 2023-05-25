@@ -1,4 +1,4 @@
-package xyz.cherish.beans.core.io;
+package xyz.cherish.test.beans.core.io;
 
 import org.junit.Test;
 import xyz.cherish.core.io.*;
