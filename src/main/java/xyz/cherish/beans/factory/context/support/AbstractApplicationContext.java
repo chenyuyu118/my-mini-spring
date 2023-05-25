@@ -72,5 +72,20 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 
     protected abstract void refreshBeanFactory() throws BeansException;
 
+    public void close() {
+        doClose();
+    }
 
+    public void registerShutdownHook() {
+        Runnable shutdownHook = this::close;
+        Runtime.getRuntime().addShutdownHook(new Thread(shutdownHook));
+    }
+
+    protected void doClose() {
+        destroyBeans();
+    }
+
+    protected void destroyBeans() {
+        getBeanFactory().destroySingleton();
+    }
 }

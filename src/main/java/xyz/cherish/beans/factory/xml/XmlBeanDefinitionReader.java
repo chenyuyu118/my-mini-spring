@@ -1,13 +1,10 @@
 package xyz.cherish.beans.factory.xml;
 
-import ch.qos.logback.core.joran.spi.XMLUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-import xyz.cherish.beans.PropertyValue;
-import xyz.cherish.beans.PropertyValues;
 import xyz.cherish.beans.factory.config.BeanDefinition;
 import xyz.cherish.beans.factory.config.BeanReference;
 import xyz.cherish.beans.factory.support.AbstractBeanDefinitionReader;
@@ -20,7 +17,6 @@ import xyz.cherish.utils.StrUtils;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import java.beans.Beans;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -32,6 +28,9 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
     public static final String CLASS_ATTRIBUTE = "class";
     public static final String VALUE_ATTRIBUTE = "value";
     public static final String REF_ATTRIBUTE = "ref";
+
+    public static final String INIT_METHOD_ATTRIBUTE = "init-method";
+    public static final String DESTROY_METHOD_ATTRIBUTE = "destroy-method";
 
     public XmlBeanDefinitionReader(BeanDefinitionRegistry registry) {
         super(registry);
@@ -78,6 +77,8 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
         String idAttr = beanEle.getAttribute(ID_ATTRIBUTE);
         String nameAttr = beanEle.getAttribute(NAME_ATTRIBUTE);
         String clazzName = beanEle.getAttribute(CLASS_ATTRIBUTE);
+        String initMethod = beanEle.getAttribute(INIT_METHOD_ATTRIBUTE);
+        String destroyMethod = beanEle.getAttribute(DESTROY_METHOD_ATTRIBUTE);
         /*
         获取bean的class对象
          */
@@ -98,6 +99,8 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
         创建bean定义
          */
         BeanDefinition beanDefinition = new BeanDefinition(clazz);
+        beanDefinition.setInitMethodName(initMethod.isEmpty() ? "" : initMethod);
+        beanDefinition.setDestroyMethodName(initMethod.isEmpty() ? "" : destroyMethod);
         /*
         初始化property
          */
@@ -107,14 +110,14 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
             Node item = propertiesNodes.item(i);
             if (item instanceof Element property) {
                 if (PROPERTY_ELEMENT.equals(property.getNodeName())) {
-                    String propertyName = ((Element) property).getAttribute(NAME_ATTRIBUTE);
-                    String propertyValue = ((Element) property).getAttribute(VALUE_ATTRIBUTE);
-                    String propertyRef = ((Element) property).getAttribute(REF_ATTRIBUTE);
+                    String propertyName = property.getAttribute(NAME_ATTRIBUTE);
+                    String propertyValue = property.getAttribute(VALUE_ATTRIBUTE);
+                    String propertyRef = property.getAttribute(REF_ATTRIBUTE);
                     if (propertyName.isEmpty()) {
                         throw new BeansException("The attribute can't be null or empty");
                     }
                     /*
-                    未属性赋值，引用值或者固定值
+                    为属性赋值，引用值或者固定值
                      */
                     Object value = propertyValue;
                     if (!propertyRef.isEmpty()) {

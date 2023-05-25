@@ -1,6 +1,8 @@
 package xyz.cherish.beans.factory.support;
 
 import xyz.cherish.beans.PropertyValue;
+import xyz.cherish.beans.factory.DisposableBean;
+import xyz.cherish.beans.factory.InitializingBean;
 import xyz.cherish.beans.factory.config.AutowireCapableBeanFactory;
 import xyz.cherish.beans.factory.config.BeanDefinition;
 import xyz.cherish.beans.factory.config.BeanPostProcessor;
@@ -9,7 +11,9 @@ import xyz.cherish.beans.factory.strategy.InstantiationStrategy;
 import xyz.cherish.beans.factory.strategy.SimpleInstantiationStrategy;
 import xyz.cherish.exception.BeansException;
 import xyz.cherish.utils.BeanUtils;
+import xyz.cherish.utils.ClassUtils;
 
+import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.Objects;
 
@@ -36,8 +40,21 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         } catch (Exception ex) {
             throw new BeansException("Instantiate failed", ex);
         }
+        // 注册有销毁方法的bean
+        registerDisposableBeanIfNecessary(beanName, bean, beanDefinition);
+
         addSingleton(beanName, bean);
         return bean;
+    }
+
+    private void registerDisposableBeanIfNecessary(String beanName, Object bean, BeanDefinition beanDefinition) {
+        if (bean instanceof DisposableBean disposableBean || !beanDefinition.getDestroyMethodName().isEmpty()) {
+            registerDisposeBean(beanName, bean, beanDefinition);
+        }
+    }
+
+    private void registerDisposeBean(String beanName, Object bean, BeanDefinition beanDefinition) {
+        registerDisposeBean(beanName, new DisposeBeanAdapter(bean, beanName, beanDefinition));
     }
 
     /**
@@ -51,15 +68,25 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
     private Object initializeBean(String beanName, Object bean, BeanDefinition beanDefinition) {
         Object processedObj = applyBeanPostProcessorBeforeInitialization(bean, beanName);
 
-        invokeInitMethods(beanName, processedObj, beanDefinition); // 执行我们需要的bean-init方法
+        try {
+            invokeInitMethods(beanName, processedObj, beanDefinition); // 执行我们需要的bean-init方法
+        } catch (Exception e) {
+            throw new BeansException("Invoke init method failed on bean[" + beanName + "]", e);
+        }
 
         processedObj = applyBeanPostProcessorAfterInitialization(bean, beanName);
         return processedObj;
     }
 
-    // TODO 后面实现bean的初始化方法
-    private void invokeInitMethods(String beanName, Object processedObj, BeanDefinition beanDefinition) {
-
+    private void invokeInitMethods(String beanName, Object bean, BeanDefinition beanDefinition) throws Exception {
+        if (bean instanceof InitializingBean initializingBean) {
+            initializingBean.afterPropertySet();
+        }
+        String initMethodName = beanDefinition.getInitMethodName();
+        if (initMethodName != null && !initMethodName.isEmpty()) {
+            Method initMethod = ClassUtils.getPublicMethod(bean, initMethodName);
+            initMethod.invoke(bean);
+        }
     }
 
     /**

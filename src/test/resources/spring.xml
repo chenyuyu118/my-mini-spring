@@ -18,5 +18,6 @@
         <property name="longFiled" value="123123123"/>
         <property name="stringFiled" value="hello world"/>
     </bean>
+    <bean id="postPrecess" class="xyz.cherish.test.beans.factory.config.CustomBeanPostProcessor"/>
 </beans>
 
