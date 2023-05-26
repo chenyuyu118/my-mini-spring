@@ -6,4 +6,9 @@ public class SimpleServiceImpl implements SimpleService {
     public void hello() {
         System.out.println("hello");
     }
+
+    @Override
+    public void error() throws NoSuchMethodException {
+        throw new NoSuchMethodException("no such method test");
+    }
 }
