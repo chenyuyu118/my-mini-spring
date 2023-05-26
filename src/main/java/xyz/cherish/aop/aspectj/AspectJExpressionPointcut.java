@@ -12,7 +12,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * 验证是否匹配切点表达式
+ * 验证是否匹配切点表达式，包含切点表达式解析能力
  */
 public class AspectJExpressionPointcut implements Pointcut, ClassFilter, MethodMatcher {
     private static final Set<PointcutPrimitive> SUPPORTED_PRIMITIVES = new HashSet<PointcutPrimitive>(); // 切点的支持Set
