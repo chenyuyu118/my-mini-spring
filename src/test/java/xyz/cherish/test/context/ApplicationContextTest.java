@@ -1,8 +1,8 @@
-package xyz.cherish.test.beans.factory.context;
+package xyz.cherish.test.context;
 
 import org.junit.Test;
-import xyz.cherish.beans.factory.context.ApplicationContext;
-import xyz.cherish.beans.factory.context.support.ClassPathXmlApplicationContext;
+import xyz.cherish.context.ApplicationContext;
+import xyz.cherish.context.support.ClassPathXmlApplicationContext;
 import xyz.cherish.test.model.User;
 import xyz.cherish.test.model.UserWithInitMethod;
 

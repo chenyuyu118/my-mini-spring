@@ -1,4 +1,4 @@
-package xyz.cherish.beans.factory.context.support;
+package xyz.cherish.context.support;
 
 import xyz.cherish.beans.factory.support.DefaultListableBeanFactory;
 import xyz.cherish.exception.BeansException;

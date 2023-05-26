@@ -1,4 +1,4 @@
-package xyz.cherish.beans.factory.context.event;
+package xyz.cherish.context.event;
 
 /**
  * Context刷新事件

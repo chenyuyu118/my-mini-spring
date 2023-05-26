@@ -1,8 +1,8 @@
-package xyz.cherish.beans.factory.context.support;
+package xyz.cherish.context.support;
 
 import xyz.cherish.beans.factory.config.BeanPostProcessor;
-import xyz.cherish.beans.factory.context.ApplicationContext;
-import xyz.cherish.beans.factory.context.ApplicationContextAware;
+import xyz.cherish.context.ApplicationContext;
+import xyz.cherish.context.ApplicationContextAware;
 import xyz.cherish.exception.BeansException;
 
 public class ApplicationContextAwareProcessor implements BeanPostProcessor {

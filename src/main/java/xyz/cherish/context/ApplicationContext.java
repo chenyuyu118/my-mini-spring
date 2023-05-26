@@ -1,4 +1,4 @@
-package xyz.cherish.beans.factory.context;
+package xyz.cherish.context;
 
 import xyz.cherish.beans.factory.HierarchicalBeanFactory;
 import xyz.cherish.beans.factory.ListableBeanFactory;

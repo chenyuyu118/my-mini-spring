@@ -1,4 +1,4 @@
-package xyz.cherish.beans.factory.context.event;
+package xyz.cherish.context.event;
 
 /**
  * 上下文关闭事件

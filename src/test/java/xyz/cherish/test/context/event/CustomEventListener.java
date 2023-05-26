@@ -1,7 +1,7 @@
-package xyz.cherish.test.beans.factory.context.event;
+package xyz.cherish.test.context.event;
 
-import xyz.cherish.beans.factory.context.ApplicationListener;
-import xyz.cherish.beans.factory.context.event.ApplicationContextEvent;
+import xyz.cherish.context.ApplicationListener;
+import xyz.cherish.context.event.ApplicationContextEvent;
 import xyz.cherish.test.model.User;
 
 public class CustomEventListener implements ApplicationListener<ApplicationContextEvent> {

@@ -1,7 +1,7 @@
-package xyz.cherish.beans.factory.context.event;
+package xyz.cherish.context.event;
 
-import xyz.cherish.beans.factory.context.ApplicationContext;
-import xyz.cherish.beans.factory.context.ApplicationEvent;
+import xyz.cherish.context.ApplicationContext;
+import xyz.cherish.context.ApplicationEvent;
 
 public class ApplicationContextEvent extends ApplicationEvent {
 

@@ -1,7 +1,7 @@
 package xyz.cherish.test.model;
 
-import xyz.cherish.beans.factory.context.ApplicationContext;
-import xyz.cherish.beans.factory.context.ApplicationContextAware;
+import xyz.cherish.context.ApplicationContext;
+import xyz.cherish.context.ApplicationContextAware;
 import xyz.cherish.exception.BeansException;
 
 public class SimpleService implements ApplicationContextAware {
@@ -9,6 +9,10 @@ public class SimpleService implements ApplicationContextAware {
 
     public ApplicationContext getApplicationContext() {
         return applicationContext;
+    }
+
+    public void sayHello() {
+        System.out.println("Hello");
     }
 
     @Override

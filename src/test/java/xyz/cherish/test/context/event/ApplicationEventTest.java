@@ -1,9 +1,9 @@
-package xyz.cherish.test.beans.factory.context.event;
+package xyz.cherish.test.context.event;
 
 import org.junit.Test;
-import xyz.cherish.beans.factory.context.ApplicationEvent;
-import xyz.cherish.beans.factory.context.ApplicationListener;
-import xyz.cherish.beans.factory.context.support.ClassPathXmlApplicationContext;
+import xyz.cherish.context.ApplicationEvent;
+import xyz.cherish.context.ApplicationListener;
+import xyz.cherish.context.support.ClassPathXmlApplicationContext;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;

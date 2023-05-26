@@ -1,4 +1,4 @@
-package xyz.cherish.beans.factory.context;
+package xyz.cherish.context;
 
 import java.util.EventListener;
 

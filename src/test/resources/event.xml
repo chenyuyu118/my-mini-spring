@@ -5,7 +5,7 @@
     <bean id="user" class="xyz.cherish.test.model.User">
         <property name="name" value="Lily"/>
     </bean>
-    <bean id="listener" class="xyz.cherish.test.beans.factory.context.event.CustomEventListener"/>
+    <bean id="listener" class="xyz.cherish.test.context.event.CustomEventListener"/>
 
 </beans>
 
