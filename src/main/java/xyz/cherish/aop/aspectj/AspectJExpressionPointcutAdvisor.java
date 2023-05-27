@@ -36,6 +36,10 @@ public class AspectJExpressionPointcutAdvisor implements PointcutAdvisor {
 
     @Override
     public Pointcut getPointcut() {
+        if (pointcut == null) {
+            // 防止通过xml配置时pointcut未初始化
+            pointcut = new AspectJExpressionPointcut(expression);
+        }
         return pointcut;
     }
 }

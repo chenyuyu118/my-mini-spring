@@ -1,6 +1,6 @@
 package xyz.cherish.test.model;
 
-public class User {
+public class User implements UserInterface {
     public String name;
 
     public User() {
@@ -23,5 +23,10 @@ public class User {
         return "User{" +
                 "name='" + name + '\'' +
                 '}';
+    }
+
+    @Override
+    public void sayHello() {
+        System.out.println("hello");
     }
 }

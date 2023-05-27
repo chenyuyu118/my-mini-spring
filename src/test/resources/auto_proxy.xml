@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <bean id="user" class="xyz.cherish.test.model.User">
+        <property name="name" value="Lily"/>
+    </bean>
+
+    <!-- 添加自动代理处理器，将会在创建bean时，将会自动创建代理类，然后将advisor应用到所有适合的bean上 -->
+    <bean class="xyz.cherish.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator">
+        <!--这里要使用cglib的动态代理不然没有对应接口，无法使用强转将Proxy对象转为User对象-->
+        <property name="proxyTargetClass" value="true"/>
+    </bean>
+
+    <!--添加一个Advisor-->
+    <bean class="xyz.cherish.aop.aspectj.AspectJExpressionPointcutAdvisor">
+        <property name="advice" ref="adviceInterceptor"/>
+        <property name="expression" value="execution (* xyz.cherish.test.model.*.*(..))"/>
+    </bean>
+
+    <!--自定义前置Interceptor作为Advisor中的处理方法-->
+    <bean class="xyz.cherish.aop.framework.adapter.MethodBeforeAdviceInterceptor" id="adviceInterceptor">
+        <property name="advice" ref="beforeAdvice"/>
+    </bean>
+
+    <!--自定义的代理前置方法-->
+    <bean class="xyz.cherish.test.model.UserBeforeAdvice" id="beforeAdvice"/>
+</beans>
+

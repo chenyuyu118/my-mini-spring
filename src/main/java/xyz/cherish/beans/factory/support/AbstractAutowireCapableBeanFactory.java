@@ -4,10 +4,7 @@ import xyz.cherish.beans.PropertyValue;
 import xyz.cherish.beans.factory.BeanFactoryAware;
 import xyz.cherish.beans.factory.DisposableBean;
 import xyz.cherish.beans.factory.InitializingBean;
-import xyz.cherish.beans.factory.config.AutowireCapableBeanFactory;
-import xyz.cherish.beans.factory.config.BeanDefinition;
-import xyz.cherish.beans.factory.config.BeanPostProcessor;
-import xyz.cherish.beans.factory.config.BeanReference;
+import xyz.cherish.beans.factory.config.*;
 import xyz.cherish.beans.factory.strategy.InstantiationStrategy;
 import xyz.cherish.beans.factory.strategy.SimpleInstantiationStrategy;
 import xyz.cherish.exception.BeansException;
@@ -30,7 +27,38 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
      * 创建bean的一般流程
      */
     protected Object createBean(String beanName, BeanDefinition beanDefinition) {
+        Object bean = resolveBeforeInstantiation(beanName, beanDefinition); // 是否需要通过代理创建bean
+        if (bean != null) {
+            return bean;
+        }
         return doCreateBean(beanName, beanDefinition);
+    }
+
+    protected Object resolveBeforeInstantiation(String beanName, BeanDefinition beanDefinition) {
+        Object bean = applyBeanPostProcessorBeforeInstantiation(beanDefinition.getBeanClass(), beanName);
+        if (bean != null) {
+            bean = applyBeanPostProcessorBeforeInitialization(bean, beanName);
+        }
+        return bean;
+    }
+
+    /**
+     * 对需要进行代理的Bean作为前置处理
+     *
+     * @param beanClass bean类型
+     * @param beanName  bean名称
+     * @return 创建的bean
+     */
+    protected Object applyBeanPostProcessorBeforeInstantiation(Class<?> beanClass, String beanName) {
+        for (BeanPostProcessor beanPostProcessor : getBeanPostProcessors()) {
+            if (beanPostProcessor instanceof InstantiationAwareBeanPostProcessor awareBeanPostProcessor) {
+                Object result = awareBeanPostProcessor.postProcessBeforeInstantiation(beanClass, beanName);
+                if (result != null) {
+                    return result;
+                }
+            }
+        }
+        return null;
     }
 
     /**
@@ -136,7 +164,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         return getInstantiationStrategy().instantiate(beanDefinition);
     }
 
-    private InstantiationStrategy getInstantiationStrategy() {
+    public InstantiationStrategy getInstantiationStrategy() {
         return Objects.requireNonNullElse(instantiationStrategy, DEFAULT_STRATEGY);
     }
 

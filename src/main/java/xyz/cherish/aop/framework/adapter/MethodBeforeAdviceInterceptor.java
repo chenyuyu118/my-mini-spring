@@ -6,9 +6,20 @@ import xyz.cherish.aop.framework.MethodBeforeAdvice;
 
 public class MethodBeforeAdviceInterceptor implements MethodInterceptor {
 
-    private final MethodBeforeAdvice advice; // 前置方法对象
+    private MethodBeforeAdvice advice; // 前置方法对象
 
     public MethodBeforeAdviceInterceptor(MethodBeforeAdvice advice) {
+        this.advice = advice;
+    }
+
+    public MethodBeforeAdviceInterceptor() {
+    }
+
+    public MethodBeforeAdvice getAdvice() {
+        return advice;
+    }
+
+    public void setAdvice(MethodBeforeAdvice advice) {
         this.advice = advice;
     }
 
