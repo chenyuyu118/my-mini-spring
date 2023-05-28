@@ -7,4 +7,7 @@
     <bean class="xyz.cherish.beans.factory.PropertyPlaceholderConfigurer">
         <property name="location" value="classpath:user.properties"/>
     </bean>
+    <bean name="user1" class="xyz.cherish.test.model.User">
+        <property name="name" value="User2"/>
+    </bean>
 </beans>

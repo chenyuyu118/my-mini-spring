@@ -4,6 +4,7 @@ import xyz.cherish.beans.factory.ConfigurableListableBeanFactory;
 import xyz.cherish.beans.factory.config.BeanDefinition;
 import xyz.cherish.exception.BeansException;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -56,5 +57,21 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
     @Override
     public String[] getBeanDefinitionNames() {
         return beanDefinitionMap.keySet().toArray(new String[0]);
+    }
+
+    @Override
+    public <T> T getBean(Class<T> requiredType) throws BeansException {
+        ArrayList<String> beanNames = new ArrayList<>();
+        for (Map.Entry<String, BeanDefinition> beanDefinitionEntry : beanDefinitionMap.entrySet()) {
+            if (requiredType.isAssignableFrom(beanDefinitionEntry.getValue().getBeanClass())) {
+                beanNames.add(beanDefinitionEntry.getKey());
+            }
+        }
+
+        if (beanNames.size() == 1) {
+            return getBean(beanNames.get(0), requiredType);
+        }
+
+        throw new BeansException(requiredType + " expected single bean but found " + beanNames.size() + ": " + beanNames);
     }
 }

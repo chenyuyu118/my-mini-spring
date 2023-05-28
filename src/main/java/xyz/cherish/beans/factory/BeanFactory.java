@@ -11,4 +11,6 @@ public interface BeanFactory {
     default <T> T getBean(String name, Class<T> clazz) throws BeansException {
         return (T) getBean(name);
     }
+
+    <T> T getBean(Class<T> requiredType) throws BeansException;
 }

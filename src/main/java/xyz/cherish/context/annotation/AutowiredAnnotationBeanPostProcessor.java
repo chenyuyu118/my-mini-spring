@@ -37,6 +37,19 @@ public class AutowiredAnnotationBeanPostProcessor implements InstantiationAwareB
                 value = beanFactory.resolveEmbeddedValue(value);
                 BeanUtils.setFileValue(bean, field.getName(), value);
             }
+            Autowired autowiredAnnotation = field.getAnnotation(Autowired.class);
+            if (autowiredAnnotation != null) {
+                Class<?> filedType = field.getType();
+                Qualifier qualifierAnnotation = field.getAnnotation(Qualifier.class);
+                Object dependsOnBean = null;
+                if (qualifierAnnotation != null) {
+                    String dependOnBeanName = qualifierAnnotation.value();
+                    dependsOnBean = beanFactory.getBean(dependOnBeanName);
+                } else {
+                    dependsOnBean = beanFactory.getBean(filedType);
+                }
+                BeanUtils.setFileValue(bean, field.getName(), dependsOnBean);
+            }
         }
         return pvs;
     }
