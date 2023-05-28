@@ -18,12 +18,12 @@ import java.util.jar.JarFile;
  * 类扫描器
  */
 public class ClassScanner {
-    private String packageName; // 包名称
-    private String packageDirName; // 包路径
-    private String packagePath; // 包路径，在Linux路径下与packageDirPath相同
-    private Filter<Class<?>> classFilter; // 类过滤器
-    private Set<Class<?>> classes = new HashSet<>(); // 成功过滤的类
-    private String packageNameWithDot;
+    private final String packageName; // 包名称
+    private final String packageDirName; // 包路径
+    private final String packagePath; // 包路径，在Linux路径下与packageDirPath相同
+    private final Filter<Class<?>> classFilter; // 类过滤器
+    private final Set<Class<?>> classes = new HashSet<>(); // 成功过滤的类
+    private final String packageNameWithDot;
 
     public ClassScanner(String packageName, Filter<Class<?>> classFilter) {
         packageDirName = packageName.replace(".", File.separator);
@@ -133,7 +133,7 @@ public class ClassScanner {
     }
 
     private Class<?> loadClass(String className) {
-        Class<?> clazz = null;
+        Class<?> clazz;
         try {
             clazz = Class.forName(className);
         } catch (ClassNotFoundException e) {

@@ -5,7 +5,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 public class PropertyValues {
-    private Map<String, PropertyValue> propertyValueMap;
+    private final Map<String, PropertyValue> propertyValueMap;
 
     public void addProperty(String key, Object value) {
         PropertyValue oldProperty;

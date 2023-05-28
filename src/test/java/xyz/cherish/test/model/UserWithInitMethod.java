@@ -4,7 +4,7 @@ public class UserWithInitMethod {
     private String name;
 
     public void print() {
-        System.out.println(toString());
+        System.out.println(this);
     }
 
     public void destroy() {

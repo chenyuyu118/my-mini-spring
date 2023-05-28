@@ -11,7 +11,7 @@ import java.util.Enumeration;
  */
 public class ClassPathResource implements Resource {
 
-    private String path;
+    private final String path;
 
     public ClassPathResource(String path) {
         this.path = path;

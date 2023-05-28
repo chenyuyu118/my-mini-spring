@@ -7,7 +7,7 @@ import xyz.cherish.aop.AdvisedSupport;
  */
 public class ProxyFactory {
 
-    private AdvisedSupport advisedSupport;
+    private final AdvisedSupport advisedSupport;
 
     public ProxyFactory(AdvisedSupport advisedSupport) {
         this.advisedSupport = advisedSupport;

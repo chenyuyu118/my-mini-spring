@@ -2,7 +2,7 @@ package xyz.cherish.beans.factory.config;
 
 public class BeanReference {
 
-    private String name;
+    private final String name;
     public String getName() {
         return name;
     }

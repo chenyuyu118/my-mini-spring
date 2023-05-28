@@ -4,7 +4,7 @@ import xyz.cherish.exception.BeansException;
 
 
 public class ClassPathXmlApplicationContext extends AbstractXmlApplicationContext {
-    private String[] configLocations;
+    private final String[] configLocations;
 
     public ClassPathXmlApplicationContext(String configLocation) throws BeansException {
         this(new String[]{configLocation});

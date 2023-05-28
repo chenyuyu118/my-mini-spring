@@ -9,7 +9,7 @@ import java.lang.reflect.Method;
 public class DisposeBeanAdapter implements DisposableBean {
     public final String destroyMethodName;
     private final String beanName;
-    private Object bean;
+    private final Object bean;
 
     public DisposeBeanAdapter(Object bean, String beanName, BeanDefinition beanDefinition) {
         this.bean = bean;
