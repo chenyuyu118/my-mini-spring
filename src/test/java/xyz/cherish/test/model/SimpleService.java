@@ -3,7 +3,9 @@ package xyz.cherish.test.model;
 import xyz.cherish.context.ApplicationContext;
 import xyz.cherish.context.ApplicationContextAware;
 import xyz.cherish.exception.BeansException;
+import xyz.cherish.stereotype.Component;
 
+@Component
 public class SimpleService implements ApplicationContextAware {
     private ApplicationContext applicationContext;
 

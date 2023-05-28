@@ -1,5 +1,8 @@
 package xyz.cherish.test.model;
 
+import xyz.cherish.stereotype.Component;
+
+@Component
 public class MultiFiledObj {
     public int intFiled;
     public Long longFiled;

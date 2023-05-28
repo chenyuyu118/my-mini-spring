@@ -88,7 +88,10 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
     private void registerDisposableBeanIfNecessary(String beanName, Object bean, BeanDefinition beanDefinition) {
         if (beanDefinition.isSingleton()) {
             // 只对单例进行销毁注册
-            if (bean instanceof DisposableBean disposableBean || !beanDefinition.getDestroyMethodName().isEmpty()) {
+            if (bean instanceof DisposableBean disposableBean
+                    || (beanDefinition.getDestroyMethodName() != null
+                    && !beanDefinition.getDestroyMethodName().isEmpty())
+            ) {
                 registerDisposeBean(beanName, bean, beanDefinition);
             }
         }

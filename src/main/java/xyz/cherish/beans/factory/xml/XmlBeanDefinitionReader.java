@@ -9,6 +9,7 @@ import xyz.cherish.beans.factory.config.BeanDefinition;
 import xyz.cherish.beans.factory.config.BeanReference;
 import xyz.cherish.beans.factory.support.AbstractBeanDefinitionReader;
 import xyz.cherish.beans.factory.support.BeanDefinitionRegistry;
+import xyz.cherish.context.annotation.ClassPathBeanDefinitionScanner;
 import xyz.cherish.core.io.Resource;
 import xyz.cherish.core.io.ResourceLoader;
 import xyz.cherish.exception.BeansException;
@@ -28,10 +29,11 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
     public static final String CLASS_ATTRIBUTE = "class";
     public static final String VALUE_ATTRIBUTE = "value";
     public static final String REF_ATTRIBUTE = "ref";
-
     public static final String INIT_METHOD_ATTRIBUTE = "init-method";
     public static final String DESTROY_METHOD_ATTRIBUTE = "destroy-method";
     public static final String SCOPE_ATTRIBUTE = "scope";
+    public static final String BASE_PACKAGE_ATTRIBUTE = "base-package";
+    public static final String COMPONENT_SCAN_ELEMENT = "context:component-scan";
 
     public XmlBeanDefinitionReader(BeanDefinitionRegistry registry) {
         super(registry);
@@ -61,6 +63,20 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
         DocumentBuilder documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         Document xmlConfigurationDoc = documentBuilder.parse(xmlIs);
         Element rootEle = xmlConfigurationDoc.getDocumentElement();
+        /*
+        提取包扫描信息
+         */
+        NodeList componentScan = rootEle.getElementsByTagName(COMPONENT_SCAN_ELEMENT);
+        if (componentScan.getLength() != 0) {
+            if (componentScan.item(0) instanceof Element componentDoc) {
+                String basePackage = componentDoc.getAttribute(BASE_PACKAGE_ATTRIBUTE);
+                if (basePackage.isEmpty()) {
+                    throw new BeansException("The value of base-package attribute can not be empty or null");
+                }
+                scanBasePackage(basePackage);
+            }
+        }
+
         NodeList eleList = rootEle.getChildNodes();
         int eleListLength = eleList.getLength();
         for (int i = 0; i < eleListLength; ++i) {
@@ -72,6 +88,12 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
                 }
             }
         }
+    }
+
+    private void scanBasePackage(String basePackage) {
+        String[] packages = basePackage.split(",");
+        ClassPathBeanDefinitionScanner scanner = new ClassPathBeanDefinitionScanner(getRegistry());
+        scanner.doScan(packages);
     }
 
     private void doLoadOneBean(Element beanEle) {
@@ -105,6 +127,8 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
         beanDefinition.setDestroyMethodName(initMethod.isEmpty() ? "" : destroyMethod);
         beanDefinition.setScope(scope);
         /*
+
+
         初始化property
          */
         NodeList propertiesNodes = beanEle.getChildNodes();
