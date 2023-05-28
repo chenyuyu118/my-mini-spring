@@ -1,6 +1,7 @@
 package xyz.cherish.beans.factory.support;
 
 import xyz.cherish.beans.PropertyValue;
+import xyz.cherish.beans.PropertyValues;
 import xyz.cherish.beans.factory.BeanFactoryAware;
 import xyz.cherish.beans.factory.DisposableBean;
 import xyz.cherish.beans.factory.InitializingBean;
@@ -35,9 +36,10 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
     }
 
     protected Object resolveBeforeInstantiation(String beanName, BeanDefinition beanDefinition) {
-        Object bean = applyBeanPostProcessorBeforeInstantiation(beanDefinition.getBeanClass(), beanName);
+        Object bean = applyBeanPostProcessorBeforeInstantiation(
+                beanDefinition.getBeanClass(), beanName); // bean实例化之前方法
         if (bean != null) {
-            bean = applyBeanPostProcessorBeforeInitialization(bean, beanName);
+            bean = applyBeanPostProcessorBeforeInitialization(bean, beanName); // bean初始化后方法
         }
         return bean;
     }
@@ -72,6 +74,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         Object bean = null;
         try {
             bean = createBeanInstance(beanDefinition); // 创建一个空实例
+            applyBeanPostProcessorBeforeApplyingPropertyValues(beanName, bean, beanDefinition); // 在属性赋值之前进行前置处理
             applyPropertyValues(beanName, bean, beanDefinition); // 赋值属性
             bean = initializeBean(beanName, bean, beanDefinition); // 进行前置和后置处理
         } catch (Exception ex) {
@@ -83,6 +86,21 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
             addSingleton(beanName, bean);
         }
         return bean;
+    }
+
+    private void applyBeanPostProcessorBeforeApplyingPropertyValues(String beanName, Object bean, BeanDefinition beanDefinition) {
+        for (BeanPostProcessor postProcessor : getBeanPostProcessors()) {
+            if (postProcessor instanceof InstantiationAwareBeanPostProcessor instantiationAwareBeanPostProcessor) {
+                PropertyValues pvs = instantiationAwareBeanPostProcessor.
+                        postProcessPropertyValues(beanDefinition.getPropertyValues(),
+                                bean, beanName);
+                Iterator<PropertyValue> valueIterator = pvs.getProperties();
+                while (valueIterator.hasNext()) {
+                    PropertyValue propertyValue = valueIterator.next();
+                    beanDefinition.addPropertyValue(propertyValue.getFiled(), propertyValue.getValue());
+                }
+            }
+        }
     }
 
     private void registerDisposableBeanIfNecessary(String beanName, Object bean, BeanDefinition beanDefinition) {
@@ -175,16 +193,6 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         this.instantiationStrategy = instantiationStrategy;
     }
 
-//    /**
-//     * 通过代理创建对象
-//     * @param beanName
-//     * @param beanDefinition
-//     * @return
-//     */
-//    private Object resolveBeforeInstantiation(String beanName, BeanDefinition beanDefinition) {
-//        Object bean = applyBeanPostProcessorBeforeInstantiation(beanDefinition.getBeanClass(), beanName);
-//        return bean;
-//    }
 
     /**
      * 在bean初始化之前进行的后置处理

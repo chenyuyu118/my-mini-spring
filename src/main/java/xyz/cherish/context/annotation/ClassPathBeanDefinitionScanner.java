@@ -8,6 +8,8 @@ import xyz.cherish.utils.StrUtils;
 import java.util.Set;
 
 public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateComponentProvider {
+    public static final String AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME = "xyz.cherish." +
+            "context.annotation.internalAutowiredAnnotationProcessor"; // 自动装配后置处理器的名称
     private final BeanDefinitionRegistry registry;
 
     public ClassPathBeanDefinitionScanner(BeanDefinitionRegistry registry) {
@@ -26,6 +28,9 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
                 registry.registerBeanDefinition(beanName, candidateComponent);
             }
         }
+
+        registry.registerBeanDefinition(AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME,
+                new BeanDefinition(AutowiredAnnotationBeanPostProcessor.class));
     }
 
     private String determineBeanName(BeanDefinition beanDefinition) {

@@ -5,6 +5,7 @@ import xyz.cherish.beans.factory.config.BeanDefinition;
 import xyz.cherish.beans.factory.config.BeanPostProcessor;
 import xyz.cherish.beans.factory.config.ConfigurableBeanFactory;
 import xyz.cherish.exception.BeansException;
+import xyz.cherish.utils.StringValueResolver;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,7 +18,7 @@ import java.util.Map;
 public abstract class AbstractBeanFactory extends DefaultSingletonRegistry implements ConfigurableBeanFactory {
     private final Map<String, Object> factoryBeanCached = new HashMap<>();
     private final List<BeanPostProcessor> beanPostProcessors = new ArrayList<>();
-
+    private final List<StringValueResolver> embeddedValueResolvers = new ArrayList<>();
 
     @Override
     public Object getBean(String beanName) throws BeansException {
@@ -82,5 +83,25 @@ public abstract class AbstractBeanFactory extends DefaultSingletonRegistry imple
     public void addBeanPostProcessor(BeanPostProcessor beanPostProcessor) {
         beanPostProcessors.remove(beanPostProcessor); // 删除原有的processor，再进行一次添加，进行覆盖操作
         beanPostProcessors.add(beanPostProcessor);
+    }
+
+    /**
+     * 处理嵌入式属性值
+     *
+     * @param value 值
+     * @return 处理后的值
+     */
+    @Override
+    public String resolveEmbeddedValue(String value) {
+        String resolvedValue = value;
+        for (StringValueResolver embeddedValueResolver : this.embeddedValueResolvers) {
+            resolvedValue = embeddedValueResolver.resolveStringValue(resolvedValue);
+        }
+        return resolvedValue;
+    }
+
+    @Override
+    public void addEmbeddedValueResolver(StringValueResolver resolver) {
+        this.embeddedValueResolvers.add(resolver);
     }
 }

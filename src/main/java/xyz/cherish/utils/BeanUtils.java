@@ -10,12 +10,15 @@ import java.lang.reflect.Field;
  */
 public class BeanUtils {
 
-    public static void setFileValue(Object bean, String filedName, Object value) throws NoSuchFieldException, IllegalAccessException {
+    public static void setFileValue(Object bean, String filedName, Object value) {
         if (isArray(bean)) {
             setArrayIndexValue(bean, filedName, value);
         } else {
-            setSimpleFiledValue(bean, filedName, value);
-
+            try {
+                setSimpleFiledValue(bean, filedName, value);
+            } catch (NoSuchFieldException | IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 

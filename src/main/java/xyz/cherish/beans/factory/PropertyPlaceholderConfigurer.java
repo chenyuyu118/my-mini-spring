@@ -7,6 +7,7 @@ import xyz.cherish.beans.factory.config.BeanFactoryPostProcessor;
 import xyz.cherish.core.io.DefaultResourceLoader;
 import xyz.cherish.core.io.Resource;
 import xyz.cherish.exception.BeansException;
+import xyz.cherish.utils.StringValueResolver;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,10 +24,17 @@ public class PropertyPlaceholderConfigurer implements BeanFactoryPostProcessor {
     public static final Pattern PLACEHOLDER_PATTERN = Pattern.compile("\\$\\{(.*)}");
     private String location;
 
-    @Override
-    public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
-        Properties properties = loadProperties(); // 加载所有属性
-        processProperties(beanFactory, properties);
+    private static String resolvePropertyValues(Properties properties, String strVal) {
+        String value = strVal;
+        Matcher matcher = PLACEHOLDER_PATTERN.matcher(strVal);
+        if (matcher.matches()) {
+            /*
+            寻找到在Properties中注册的键值对
+             */
+            String key = matcher.group(1).trim();
+            value = properties.getProperty(key);
+        }
+        return value;
     }
 
     /**
@@ -43,6 +51,18 @@ public class PropertyPlaceholderConfigurer implements BeanFactoryPostProcessor {
         }
     }
 
+    @Override
+    public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+        Properties properties = loadProperties(); // 加载所有属性
+
+        // 使用属性替换占位符
+        processProperties(beanFactory, properties);
+
+        // 容器中添加字符解析器，将@Value注解解析为属性值
+        PlaceholderResolvingStringValueResolver valueResolver = new PlaceholderResolvingStringValueResolver(properties);
+        beanFactory.addEmbeddedValueResolver(valueResolver);
+    }
+
     private void resolvePropertyValues(BeanDefinition beanDefinition, Properties properties) {
         PropertyValues propertyValues = beanDefinition.getPropertyValues();
         Iterator<PropertyValue> propertyIterator = propertyValues.getProperties();
@@ -50,18 +70,8 @@ public class PropertyPlaceholderConfigurer implements BeanFactoryPostProcessor {
             // 遍历所有bean定义的属性，寻找需要替换的占位符
             PropertyValue propertyValue = propertyIterator.next();
             if (propertyValue.getValue() instanceof String strVal) {
-                Matcher matcher = PLACEHOLDER_PATTERN.matcher(strVal);
-                if (matcher.matches()) {
-                    /*
-                    寻找到在Properties中注册的键值对
-                     */
-                    String key = matcher.group(1).trim();
-                    String value = properties.getProperty(key);
-                    /*
-                    修改bean定义的值
-                     */
-                    propertyValues.addProperty(propertyValue.getFiled(), value);
-                }
+                String value = resolvePropertyValues(properties, strVal);
+                propertyValues.addProperty(propertyValue.getFiled(), value);
             }
         }
     }
@@ -87,5 +97,21 @@ public class PropertyPlaceholderConfigurer implements BeanFactoryPostProcessor {
 
     public void setLocation(String location) {
         this.location = location;
+    }
+
+    /**
+     * 解析特殊的属性值
+     */
+    private class PlaceholderResolvingStringValueResolver implements StringValueResolver {
+        private final Properties properties;
+
+        public PlaceholderResolvingStringValueResolver(Properties properties) {
+            this.properties = properties;
+        }
+
+        @Override
+        public String resolveStringValue(String strVal) {
+            return resolvePropertyValues(properties, strVal);
+        }
     }
 }
